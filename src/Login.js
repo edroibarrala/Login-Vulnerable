@@ -42,7 +42,14 @@ function Login() {
   };
 
   return (
-    <div>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100vh',
+      fontFamily: 'Arial, sans-serif'
+    }}>
       <h2>Login</h2>
       <input placeholder="usuario" onChange={e => setUsername(e.target.value)} />
       <input type="password" placeholder="password" onChange={e => setPassword(e.target.value)} />
