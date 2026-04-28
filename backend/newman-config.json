@@ -1,0 +1,18 @@
+{
+  "collection": "./postman-collection.json",
+  "environment": "./postman-environment.json",
+  "reporters": ["cli", "json", "html"],
+  "reporter": {
+    "json": {
+      "export": "./test-results/newman-report.json"
+    },
+    "html": {
+      "export": "./test-results/newman-report.html"
+    }
+  },
+  "bail": false,
+  "globals": {},
+  "timeout": 5000,
+  "timeoutScript": 5000,
+  "timeoutRequest": 5000
+}

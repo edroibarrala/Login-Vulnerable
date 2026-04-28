@@ -1,0 +1,246 @@
+{
+  "info": {
+    "_postman_id": "login-auth-api",
+    "name": "Login Vulnerable API",
+    "description": "Collection de pruebas para autenticación JWT",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Public Endpoint",
+      "item": [
+        {
+          "name": "GET /public",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('public endpoint');",
+                  "});",
+                  "",
+                  "pm.test('Tiempo de respuesta menor a 1000ms', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/public",
+              "host": ["{{base_url}}"],
+              "path": ["public"]
+            },
+            "description": "Endpoint público sin autenticación"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Valid Credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene token', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('token');",
+                  "  pm.expect(responseJson.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Guardar token en variable', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.environment.set('auth_token', responseJson.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Login con credenciales válidas"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Invalid Credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de error', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Login con credenciales inválidas"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Protected Endpoints",
+      "item": [
+        {
+          "name": "GET /dashboard - Con Token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Obtener token guardado o hacer login",
+                  "const token = pm.environment.get('auth_token');",
+                  "if (!token) {",
+                  "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de bienvenida', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('dashboard');",
+                  "});",
+                  "",
+                  "pm.test('Response contiene datos del usuario', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('users');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard"]
+            },
+            "description": "Acceder al dashboard con token válido"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /dashboard - Sin Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard"]
+            },
+            "description": "Intentar acceder al dashboard sin token"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    }
+  ]
+}

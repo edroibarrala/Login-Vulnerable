@@ -1,0 +1,6278 @@
+{
+  "collection": {
+    "_": {
+      "postman_id": "login-auth-api"
+    },
+    "item": [
+      {
+        "id": "460ab86f-fc82-4646-bf5f-e95cb87b368a",
+        "name": "Public Endpoint",
+        "item": [
+          {
+            "id": "56412012-bb84-4afd-895b-84a9c7a1a002",
+            "name": "GET /public",
+            "request": {
+              "description": {
+                "content": "Endpoint público sin autenticación",
+                "type": "text/plain"
+              },
+              "url": {
+                "path": [
+                  "public"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "22d9ad5b-0953-4697-a860-783cd4ec0449",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code es 200', function () {",
+                    "  pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response contiene mensaje', function () {",
+                    "  const responseJson = pm.response.json();",
+                    "  pm.expect(responseJson).to.have.property('message');",
+                    "  pm.expect(responseJson.message).to.include('public endpoint');",
+                    "});",
+                    "",
+                    "pm.test('Tiempo de respuesta menor a 1000ms', function () {",
+                    "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "838a3fca-8a38-4c83-b768-cd7e4e5183aa"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "b3c07c82-2fa9-4519-ba2a-fff45d67f80e",
+        "name": "Authentication",
+        "item": [
+          {
+            "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+            "name": "Login - Valid Credentials",
+            "request": {
+              "description": {
+                "content": "Login con credenciales válidas",
+                "type": "text/plain"
+              },
+              "url": {
+                "path": [
+                  "login"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code es 200', function () {",
+                    "  pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response contiene token', function () {",
+                    "  const responseJson = pm.response.json();",
+                    "  pm.expect(responseJson).to.have.property('token');",
+                    "  pm.expect(responseJson.token).to.be.a('string');",
+                    "});",
+                    "",
+                    "pm.test('Guardar token en variable', function () {",
+                    "  const responseJson = pm.response.json();",
+                    "  pm.environment.set('auth_token', responseJson.token);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+                }
+              }
+            ]
+          },
+          {
+            "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+            "name": "Login - Invalid Credentials",
+            "request": {
+              "description": {
+                "content": "Login con credenciales inválidas",
+                "type": "text/plain"
+              },
+              "url": {
+                "path": [
+                  "login"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code es 401', function () {",
+                    "  pm.response.to.have.status(401);",
+                    "});",
+                    "",
+                    "pm.test('Response contiene mensaje de error', function () {",
+                    "  const responseJson = pm.response.json();",
+                    "  pm.expect(responseJson).to.have.property('message');",
+                    "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "096c4a06-cdc5-4889-8da0-a0eeace2cd62",
+        "name": "Protected Endpoints",
+        "item": [
+          {
+            "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+            "name": "GET /dashboard - Con Token",
+            "request": {
+              "description": {
+                "content": "Acceder al dashboard con token válido",
+                "type": "text/plain"
+              },
+              "url": {
+                "path": [
+                  "dashboard"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                  "type": "text/javascript",
+                  "exec": [
+                    "// Obtener token guardado o hacer login",
+                    "const token = pm.environment.get('auth_token');",
+                    "if (!token) {",
+                    "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                    "}"
+                  ],
+                  "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+                }
+              },
+              {
+                "listen": "test",
+                "script": {
+                  "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code es 200', function () {",
+                    "  pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('Response contiene mensaje de bienvenida', function () {",
+                    "  const responseJson = pm.response.json();",
+                    "  pm.expect(responseJson).to.have.property('message');",
+                    "  pm.expect(responseJson.message).to.include('dashboard');",
+                    "});",
+                    "",
+                    "pm.test('Response contiene datos del usuario', function () {",
+                    "  const responseJson = pm.response.json();",
+                    "  pm.expect(responseJson).to.have.property('users');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+                }
+              }
+            ]
+          },
+          {
+            "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+            "name": "GET /dashboard - Sin Token",
+            "request": {
+              "description": {
+                "content": "Intentar acceder al dashboard sin token",
+                "type": "text/plain"
+              },
+              "url": {
+                "path": [
+                  "dashboard"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('Status code es 401', function () {",
+                    "  pm.response.to.have.status(401);",
+                    "});",
+                    "",
+                    "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                    "  const responseJson = pm.response.json();",
+                    "  pm.expect(responseJson).to.have.property('message');",
+                    "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "event": [],
+    "variable": [
+      {
+        "type": "any",
+        "value": "http://localhost:3000",
+        "key": "base_url"
+      }
+    ],
+    "info": {
+      "_postman_id": "login-auth-api",
+      "name": "Login Vulnerable API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Collection de pruebas para autenticación JWT",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_id": "login-env",
+      "postman_variable_scope": "environment",
+      "postman_exported_at": "2026-04-28T00:00:00.000Z",
+      "postman_exported_using": "Postman/11.0.0"
+    },
+    "id": "login-env",
+    "name": "Login API - Environment",
+    "values": [
+      {
+        "type": "string",
+        "value": "http://localhost:4000",
+        "key": "base_url"
+      },
+      {
+        "type": "string",
+        "value": "",
+        "key": "auth_token"
+      },
+      {
+        "type": "string",
+        "value": "edwar",
+        "key": "valid_username"
+      },
+      {
+        "type": "string",
+        "value": "password",
+        "key": "valid_password"
+      },
+      {
+        "type": "string",
+        "value": "invalid",
+        "key": "invalid_username"
+      },
+      {
+        "type": "string",
+        "value": "wrong",
+        "key": "invalid_password"
+      }
+    ]
+  },
+  "globals": {
+    "id": "b0ecb63d-02dd-4834-9c8b-5f0975cc1300",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 6,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 13,
+        "pending": 0,
+        "failed": 10
+      },
+      "testScripts": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 39.6,
+      "responseMin": 11,
+      "responseMax": 85,
+      "responseSd": 31.721286228650943,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1777391733940,
+      "completed": 1777391734666
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 5,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "5116da3a-5a7a-407d-8199-4890e4d28b5d",
+          "httpRequestId": "ab99a567-6413-4b23-85d0-519fe1cbab78"
+        },
+        "item": {
+          "id": "56412012-bb84-4afd-895b-84a9c7a1a002",
+          "name": "GET /public",
+          "request": {
+            "description": {
+              "content": "Endpoint público sin autenticación",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "public"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "22d9ad5b-0953-4697-a860-783cd4ec0449",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('public endpoint');",
+                  "});",
+                  "",
+                  "pm.test('Tiempo de respuesta menor a 1000ms', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "_lastExecutionId": "838a3fca-8a38-4c83-b768-cd7e4e5183aa"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Endpoint público sin autenticación",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "public"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "34a823c9-4b21-4390-ac69-ca5acacab26c",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:4000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "4ed64523-fb50-413f-aa12-b5711342e9f4",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "54"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"36-O499fylAJEBef9cb3ERIDOg5G9Y\""
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 28 Apr 2026 15:55:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              84,
+              104,
+              105,
+              115,
+              32,
+              105,
+              115,
+              32,
+              97,
+              32,
+              112,
+              117,
+              98,
+              108,
+              105,
+              99,
+              32,
+              101,
+              110,
+              100,
+              112,
+              111,
+              105,
+              110,
+              116,
+              44,
+              32,
+              69,
+              100,
+              119,
+              97,
+              114,
+              32,
+              73,
+              98,
+              97,
+              114,
+              114,
+              97,
+              33,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 71,
+          "responseSize": 54
+        },
+        "id": "56412012-bb84-4afd-895b-84a9c7a1a002",
+        "assertions": [
+          {
+            "assertion": "Status code es 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Response contiene mensaje",
+            "skipped": false
+          },
+          {
+            "assertion": "Tiempo de respuesta menor a 1000ms",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "07a2e4b2-a1be-4d7d-bc75-69601253ca5d",
+          "length": 5,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "be08dcb3-8f37-4afa-9513-8fb2565134e3"
+        },
+        "item": {
+          "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+          "name": "Login - Valid Credentials",
+          "request": {
+            "description": {
+              "content": "Login con credenciales válidas",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene token', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('token');",
+                  "  pm.expect(responseJson.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Guardar token en variable', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.environment.set('auth_token', responseJson.token);",
+                  "});"
+                ],
+                "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Login con credenciales válidas",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "login"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "8576f47f-ddd2-4e26-bed8-bd602ee72b15",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:4000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "62",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+          }
+        },
+        "response": {
+          "id": "508b7ac8-ca6b-44e2-b77f-2c3617260563",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Security-Policy",
+              "value": "default-src 'none'"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "1313"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 28 Apr 2026 15:55:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              60,
+              33,
+              68,
+              79,
+              67,
+              84,
+              89,
+              80,
+              69,
+              32,
+              104,
+              116,
+              109,
+              108,
+              62,
+              10,
+              60,
+              104,
+              116,
+              109,
+              108,
+              32,
+              108,
+              97,
+              110,
+              103,
+              61,
+              34,
+              101,
+              110,
+              34,
+              62,
+              10,
+              60,
+              104,
+              101,
+              97,
+              100,
+              62,
+              10,
+              60,
+              109,
+              101,
+              116,
+              97,
+              32,
+              99,
+              104,
+              97,
+              114,
+              115,
+              101,
+              116,
+              61,
+              34,
+              117,
+              116,
+              102,
+              45,
+              56,
+              34,
+              62,
+              10,
+              60,
+              116,
+              105,
+              116,
+              108,
+              101,
+              62,
+              69,
+              114,
+              114,
+              111,
+              114,
+              60,
+              47,
+              116,
+              105,
+              116,
+              108,
+              101,
+              62,
+              10,
+              60,
+              47,
+              104,
+              101,
+              97,
+              100,
+              62,
+              10,
+              60,
+              98,
+              111,
+              100,
+              121,
+              62,
+              10,
+              60,
+              112,
+              114,
+              101,
+              62,
+              83,
+              121,
+              110,
+              116,
+              97,
+              120,
+              69,
+              114,
+              114,
+              111,
+              114,
+              58,
+              32,
+              69,
+              120,
+              112,
+              101,
+              99,
+              116,
+              101,
+              100,
+              32,
+              112,
+              114,
+              111,
+              112,
+              101,
+              114,
+              116,
+              121,
+              32,
+              110,
+              97,
+              109,
+              101,
+              32,
+              111,
+              114,
+              32,
+              38,
+              35,
+              51,
+              57,
+              59,
+              125,
+              38,
+              35,
+              51,
+              57,
+              59,
+              32,
+              105,
+              110,
+              32,
+              74,
+              83,
+              79,
+              78,
+              32,
+              97,
+              116,
+              32,
+              112,
+              111,
+              115,
+              105,
+              116,
+              105,
+              111,
+              110,
+              32,
+              49,
+              32,
+              40,
+              108,
+              105,
+              110,
+              101,
+              32,
+              49,
+              32,
+              99,
+              111,
+              108,
+              117,
+              109,
+              110,
+              32,
+              50,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              74,
+              83,
+              79,
+              78,
+              46,
+              112,
+              97,
+              114,
+              115,
+              101,
+              32,
+              40,
+              38,
+              108,
+              116,
+              59,
+              97,
+              110,
+              111,
+              110,
+              121,
+              109,
+              111,
+              117,
+              115,
+              38,
+              103,
+              116,
+              59,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              112,
+              97,
+              114,
+              115,
+              101,
+              32,
+              40,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              98,
+              111,
+              100,
+              121,
+              45,
+              112,
+              97,
+              114,
+              115,
+              101,
+              114,
+              92,
+              108,
+              105,
+              98,
+              92,
+              116,
+              121,
+              112,
+              101,
+              115,
+              92,
+              106,
+              115,
+              111,
+              110,
+              46,
+              106,
+              115,
+              58,
+              55,
+              50,
+              58,
+              49,
+              57,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              98,
+              111,
+              100,
+              121,
+              45,
+              112,
+              97,
+              114,
+              115,
+              101,
+              114,
+              92,
+              108,
+              105,
+              98,
+              92,
+              114,
+              101,
+              97,
+              100,
+              46,
+              106,
+              115,
+              58,
+              49,
+              54,
+              50,
+              58,
+              49,
+              56,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              65,
+              115,
+              121,
+              110,
+              99,
+              82,
+              101,
+              115,
+              111,
+              117,
+              114,
+              99,
+              101,
+              46,
+              114,
+              117,
+              110,
+              73,
+              110,
+              65,
+              115,
+              121,
+              110,
+              99,
+              83,
+              99,
+              111,
+              112,
+              101,
+              32,
+              40,
+              110,
+              111,
+              100,
+              101,
+              58,
+              97,
+              115,
+              121,
+              110,
+              99,
+              95,
+              104,
+              111,
+              111,
+              107,
+              115,
+              58,
+              50,
+              49,
+              52,
+              58,
+              49,
+              52,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              105,
+              110,
+              118,
+              111,
+              107,
+              101,
+              67,
+              97,
+              108,
+              108,
+              98,
+              97,
+              99,
+              107,
+              32,
+              40,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              114,
+              97,
+              119,
+              45,
+              98,
+              111,
+              100,
+              121,
+              92,
+              105,
+              110,
+              100,
+              101,
+              120,
+              46,
+              106,
+              115,
+              58,
+              50,
+              51,
+              56,
+              58,
+              49,
+              54,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              100,
+              111,
+              110,
+              101,
+              32,
+              40,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              114,
+              97,
+              119,
+              45,
+              98,
+              111,
+              100,
+              121,
+              92,
+              105,
+              110,
+              100,
+              101,
+              120,
+              46,
+              106,
+              115,
+              58,
+              50,
+              50,
+              55,
+              58,
+              55,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              73,
+              110,
+              99,
+              111,
+              109,
+              105,
+              110,
+              103,
+              77,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              46,
+              111,
+              110,
+              69,
+              110,
+              100,
+              32,
+              40,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              114,
+              97,
+              119,
+              45,
+              98,
+              111,
+              100,
+              121,
+              92,
+              105,
+              110,
+              100,
+              101,
+              120,
+              46,
+              106,
+              115,
+              58,
+              50,
+              56,
+              55,
+              58,
+              55,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              73,
+              110,
+              99,
+              111,
+              109,
+              105,
+              110,
+              103,
+              77,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              46,
+              101,
+              109,
+              105,
+              116,
+              32,
+              40,
+              110,
+              111,
+              100,
+              101,
+              58,
+              101,
+              118,
+              101,
+              110,
+              116,
+              115,
+              58,
+              53,
+              49,
+              57,
+              58,
+              50,
+              56,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              101,
+              110,
+              100,
+              82,
+              101,
+              97,
+              100,
+              97,
+              98,
+              108,
+              101,
+              78,
+              84,
+              32,
+              40,
+              110,
+              111,
+              100,
+              101,
+              58,
+              105,
+              110,
+              116,
+              101,
+              114,
+              110,
+              97,
+              108,
+              47,
+              115,
+              116,
+              114,
+              101,
+              97,
+              109,
+              115,
+              47,
+              114,
+              101,
+              97,
+              100,
+              97,
+              98,
+              108,
+              101,
+              58,
+              49,
+              54,
+              57,
+              56,
+              58,
+              49,
+              50,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              112,
+              114,
+              111,
+              99,
+              101,
+              115,
+              115,
+              46,
+              112,
+              114,
+              111,
+              99,
+              101,
+              115,
+              115,
+              84,
+              105,
+              99,
+              107,
+              115,
+              65,
+              110,
+              100,
+              82,
+              101,
+              106,
+              101,
+              99,
+              116,
+              105,
+              111,
+              110,
+              115,
+              32,
+              40,
+              110,
+              111,
+              100,
+              101,
+              58,
+              105,
+              110,
+              116,
+              101,
+              114,
+              110,
+              97,
+              108,
+              47,
+              112,
+              114,
+              111,
+              99,
+              101,
+              115,
+              115,
+              47,
+              116,
+              97,
+              115,
+              107,
+              95,
+              113,
+              117,
+              101,
+              117,
+              101,
+              115,
+              58,
+              57,
+              48,
+              58,
+              50,
+              49,
+              41,
+              60,
+              47,
+              112,
+              114,
+              101,
+              62,
+              10,
+              60,
+              47,
+              98,
+              111,
+              100,
+              121,
+              62,
+              10,
+              60,
+              47,
+              104,
+              116,
+              109,
+              108,
+              62,
+              10
+            ]
+          },
+          "cookie": [],
+          "responseTime": 85,
+          "responseSize": 1313
+        },
+        "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+        "assertions": [
+          {
+            "assertion": "Status code es 200",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code es 200",
+              "message": "expected response to have status code 200 but got 400",
+              "stack": "AssertionError: expected response to have status code 200 but got 400\n   at Object.eval sandbox-script.js:1:2)"
+            }
+          },
+          {
+            "assertion": "Response contiene token",
+            "skipped": false,
+            "error": {
+              "name": "JSONError",
+              "index": 1,
+              "test": "Response contiene token",
+              "message": "Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^",
+              "stack": "JSONError: Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^\n   at Object.eval sandbox-script.js:2:2)"
+            }
+          },
+          {
+            "assertion": "Guardar token en variable",
+            "skipped": false,
+            "error": {
+              "name": "JSONError",
+              "index": 2,
+              "test": "Guardar token en variable",
+              "message": "Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^",
+              "stack": "JSONError: Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^\n   at Object.eval sandbox-script.js:3:2)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "f3e2677d-7a6a-4efc-a49f-31330b295cc4",
+          "length": 5,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "ee5921b4-01db-4599-85ea-06b6df70b7ed"
+        },
+        "item": {
+          "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+          "name": "Login - Invalid Credentials",
+          "request": {
+            "description": {
+              "content": "Login con credenciales inválidas",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de error', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                  "});"
+                ],
+                "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Login con credenciales inválidas",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "login"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "9db27bbc-86cc-47cc-8a49-0fab8375a0ed",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:4000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "61",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+          }
+        },
+        "response": {
+          "id": "17303ae5-aff4-4678-90f5-d61dd745428e",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Content-Security-Policy",
+              "value": "default-src 'none'"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "1313"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 28 Apr 2026 15:55:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              60,
+              33,
+              68,
+              79,
+              67,
+              84,
+              89,
+              80,
+              69,
+              32,
+              104,
+              116,
+              109,
+              108,
+              62,
+              10,
+              60,
+              104,
+              116,
+              109,
+              108,
+              32,
+              108,
+              97,
+              110,
+              103,
+              61,
+              34,
+              101,
+              110,
+              34,
+              62,
+              10,
+              60,
+              104,
+              101,
+              97,
+              100,
+              62,
+              10,
+              60,
+              109,
+              101,
+              116,
+              97,
+              32,
+              99,
+              104,
+              97,
+              114,
+              115,
+              101,
+              116,
+              61,
+              34,
+              117,
+              116,
+              102,
+              45,
+              56,
+              34,
+              62,
+              10,
+              60,
+              116,
+              105,
+              116,
+              108,
+              101,
+              62,
+              69,
+              114,
+              114,
+              111,
+              114,
+              60,
+              47,
+              116,
+              105,
+              116,
+              108,
+              101,
+              62,
+              10,
+              60,
+              47,
+              104,
+              101,
+              97,
+              100,
+              62,
+              10,
+              60,
+              98,
+              111,
+              100,
+              121,
+              62,
+              10,
+              60,
+              112,
+              114,
+              101,
+              62,
+              83,
+              121,
+              110,
+              116,
+              97,
+              120,
+              69,
+              114,
+              114,
+              111,
+              114,
+              58,
+              32,
+              69,
+              120,
+              112,
+              101,
+              99,
+              116,
+              101,
+              100,
+              32,
+              112,
+              114,
+              111,
+              112,
+              101,
+              114,
+              116,
+              121,
+              32,
+              110,
+              97,
+              109,
+              101,
+              32,
+              111,
+              114,
+              32,
+              38,
+              35,
+              51,
+              57,
+              59,
+              125,
+              38,
+              35,
+              51,
+              57,
+              59,
+              32,
+              105,
+              110,
+              32,
+              74,
+              83,
+              79,
+              78,
+              32,
+              97,
+              116,
+              32,
+              112,
+              111,
+              115,
+              105,
+              116,
+              105,
+              111,
+              110,
+              32,
+              49,
+              32,
+              40,
+              108,
+              105,
+              110,
+              101,
+              32,
+              49,
+              32,
+              99,
+              111,
+              108,
+              117,
+              109,
+              110,
+              32,
+              50,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              74,
+              83,
+              79,
+              78,
+              46,
+              112,
+              97,
+              114,
+              115,
+              101,
+              32,
+              40,
+              38,
+              108,
+              116,
+              59,
+              97,
+              110,
+              111,
+              110,
+              121,
+              109,
+              111,
+              117,
+              115,
+              38,
+              103,
+              116,
+              59,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              112,
+              97,
+              114,
+              115,
+              101,
+              32,
+              40,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              98,
+              111,
+              100,
+              121,
+              45,
+              112,
+              97,
+              114,
+              115,
+              101,
+              114,
+              92,
+              108,
+              105,
+              98,
+              92,
+              116,
+              121,
+              112,
+              101,
+              115,
+              92,
+              106,
+              115,
+              111,
+              110,
+              46,
+              106,
+              115,
+              58,
+              55,
+              50,
+              58,
+              49,
+              57,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              98,
+              111,
+              100,
+              121,
+              45,
+              112,
+              97,
+              114,
+              115,
+              101,
+              114,
+              92,
+              108,
+              105,
+              98,
+              92,
+              114,
+              101,
+              97,
+              100,
+              46,
+              106,
+              115,
+              58,
+              49,
+              54,
+              50,
+              58,
+              49,
+              56,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              65,
+              115,
+              121,
+              110,
+              99,
+              82,
+              101,
+              115,
+              111,
+              117,
+              114,
+              99,
+              101,
+              46,
+              114,
+              117,
+              110,
+              73,
+              110,
+              65,
+              115,
+              121,
+              110,
+              99,
+              83,
+              99,
+              111,
+              112,
+              101,
+              32,
+              40,
+              110,
+              111,
+              100,
+              101,
+              58,
+              97,
+              115,
+              121,
+              110,
+              99,
+              95,
+              104,
+              111,
+              111,
+              107,
+              115,
+              58,
+              50,
+              49,
+              52,
+              58,
+              49,
+              52,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              105,
+              110,
+              118,
+              111,
+              107,
+              101,
+              67,
+              97,
+              108,
+              108,
+              98,
+              97,
+              99,
+              107,
+              32,
+              40,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              114,
+              97,
+              119,
+              45,
+              98,
+              111,
+              100,
+              121,
+              92,
+              105,
+              110,
+              100,
+              101,
+              120,
+              46,
+              106,
+              115,
+              58,
+              50,
+              51,
+              56,
+              58,
+              49,
+              54,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              100,
+              111,
+              110,
+              101,
+              32,
+              40,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              114,
+              97,
+              119,
+              45,
+              98,
+              111,
+              100,
+              121,
+              92,
+              105,
+              110,
+              100,
+              101,
+              120,
+              46,
+              106,
+              115,
+              58,
+              50,
+              50,
+              55,
+              58,
+              55,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              73,
+              110,
+              99,
+              111,
+              109,
+              105,
+              110,
+              103,
+              77,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              46,
+              111,
+              110,
+              69,
+              110,
+              100,
+              32,
+              40,
+              67,
+              58,
+              92,
+              85,
+              115,
+              101,
+              114,
+              115,
+              92,
+              112,
+              114,
+              111,
+              115,
+              97,
+              92,
+              79,
+              110,
+              101,
+              68,
+              114,
+              105,
+              118,
+              101,
+              92,
+              69,
+              115,
+              99,
+              114,
+              105,
+              116,
+              111,
+              114,
+              105,
+              111,
+              92,
+              49,
+              48,
+              109,
+              111,
+              92,
+              102,
+              117,
+              108,
+              108,
+              32,
+              115,
+              116,
+              97,
+              107,
+              92,
+              76,
+              111,
+              103,
+              105,
+              110,
+              45,
+              86,
+              85,
+              108,
+              110,
+              101,
+              114,
+              97,
+              98,
+              108,
+              101,
+              92,
+              98,
+              97,
+              99,
+              107,
+              101,
+              110,
+              100,
+              92,
+              110,
+              111,
+              100,
+              101,
+              95,
+              109,
+              111,
+              100,
+              117,
+              108,
+              101,
+              115,
+              92,
+              114,
+              97,
+              119,
+              45,
+              98,
+              111,
+              100,
+              121,
+              92,
+              105,
+              110,
+              100,
+              101,
+              120,
+              46,
+              106,
+              115,
+              58,
+              50,
+              56,
+              55,
+              58,
+              55,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              73,
+              110,
+              99,
+              111,
+              109,
+              105,
+              110,
+              103,
+              77,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              46,
+              101,
+              109,
+              105,
+              116,
+              32,
+              40,
+              110,
+              111,
+              100,
+              101,
+              58,
+              101,
+              118,
+              101,
+              110,
+              116,
+              115,
+              58,
+              53,
+              49,
+              57,
+              58,
+              50,
+              56,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              101,
+              110,
+              100,
+              82,
+              101,
+              97,
+              100,
+              97,
+              98,
+              108,
+              101,
+              78,
+              84,
+              32,
+              40,
+              110,
+              111,
+              100,
+              101,
+              58,
+              105,
+              110,
+              116,
+              101,
+              114,
+              110,
+              97,
+              108,
+              47,
+              115,
+              116,
+              114,
+              101,
+              97,
+              109,
+              115,
+              47,
+              114,
+              101,
+              97,
+              100,
+              97,
+              98,
+              108,
+              101,
+              58,
+              49,
+              54,
+              57,
+              56,
+              58,
+              49,
+              50,
+              41,
+              60,
+              98,
+              114,
+              62,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              32,
+              38,
+              110,
+              98,
+              115,
+              112,
+              59,
+              97,
+              116,
+              32,
+              112,
+              114,
+              111,
+              99,
+              101,
+              115,
+              115,
+              46,
+              112,
+              114,
+              111,
+              99,
+              101,
+              115,
+              115,
+              84,
+              105,
+              99,
+              107,
+              115,
+              65,
+              110,
+              100,
+              82,
+              101,
+              106,
+              101,
+              99,
+              116,
+              105,
+              111,
+              110,
+              115,
+              32,
+              40,
+              110,
+              111,
+              100,
+              101,
+              58,
+              105,
+              110,
+              116,
+              101,
+              114,
+              110,
+              97,
+              108,
+              47,
+              112,
+              114,
+              111,
+              99,
+              101,
+              115,
+              115,
+              47,
+              116,
+              97,
+              115,
+              107,
+              95,
+              113,
+              117,
+              101,
+              117,
+              101,
+              115,
+              58,
+              57,
+              48,
+              58,
+              50,
+              49,
+              41,
+              60,
+              47,
+              112,
+              114,
+              101,
+              62,
+              10,
+              60,
+              47,
+              98,
+              111,
+              100,
+              121,
+              62,
+              10,
+              60,
+              47,
+              104,
+              116,
+              109,
+              108,
+              62,
+              10
+            ]
+          },
+          "cookie": [],
+          "responseTime": 11,
+          "responseSize": 1313
+        },
+        "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+        "assertions": [
+          {
+            "assertion": "Status code es 401",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code es 401",
+              "message": "expected response to have status code 401 but got 400",
+              "stack": "AssertionError: expected response to have status code 401 but got 400\n   at Object.eval sandbox-script.js:1:3)"
+            }
+          },
+          {
+            "assertion": "Response contiene mensaje de error",
+            "skipped": false,
+            "error": {
+              "name": "JSONError",
+              "index": 1,
+              "test": "Response contiene mensaje de error",
+              "message": "Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^",
+              "stack": "JSONError: Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^\n   at Object.eval sandbox-script.js:2:3)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "83010dc6-8e71-4ce3-9143-3937cf702530",
+          "length": 5,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "053d0599-2435-481e-b8b0-cd2e91590636"
+        },
+        "item": {
+          "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+          "name": "GET /dashboard - Con Token",
+          "request": {
+            "description": {
+              "content": "Acceder al dashboard con token válido",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "dashboard"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                "type": "text/javascript",
+                "exec": [
+                  "// Obtener token guardado o hacer login",
+                  "const token = pm.environment.get('auth_token');",
+                  "if (!token) {",
+                  "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                  "}"
+                ],
+                "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de bienvenida', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('dashboard');",
+                  "});",
+                  "",
+                  "pm.test('Response contiene datos del usuario', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('users');",
+                  "});"
+                ],
+                "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Acceder al dashboard con token válido",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "dashboard"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer "
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "4da10b6b-613e-406f-8ead-740067c2543c",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:4000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "079c32da-b817-47d5-ae21-532e329fd19f",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "29"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1d-Ifw+DpNE0QLD1xqKr+WwOp6Mgp8\""
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 28 Apr 2026 15:55:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              84,
+              111,
+              107,
+              101,
+              110,
+              32,
+              105,
+              110,
+              118,
+              195,
+              161,
+              108,
+              105,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 17,
+          "responseSize": 29
+        },
+        "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+        "assertions": [
+          {
+            "assertion": "Status code es 200",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code es 200",
+              "message": "expected response to have status code 200 but got 401",
+              "stack": "AssertionError: expected response to have status code 200 but got 401\n   at Object.eval sandbox-script.js:1:4)"
+            }
+          },
+          {
+            "assertion": "Response contiene mensaje de bienvenida",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "Response contiene mensaje de bienvenida",
+              "message": "expected 'Token inválido' to include 'dashboard'",
+              "stack": "AssertionError: expected 'Token inválido' to include 'dashboard'\n   at Object.eval sandbox-script.js:2:4)"
+            }
+          },
+          {
+            "assertion": "Response contiene datos del usuario",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 2,
+              "test": "Response contiene datos del usuario",
+              "message": "expected { message: 'Token inválido' } to have property 'users'",
+              "stack": "AssertionError: expected { message: 'Token inválido' } to have property 'users'\n   at Object.eval sandbox-script.js:3:4)"
+            }
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "bc0e7f6f-592d-42e1-b69a-aa472062f847",
+          "length": 5,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "8db19d3d-b491-4a24-b9a3-eccd2626b7b0"
+        },
+        "item": {
+          "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+          "name": "GET /dashboard - Sin Token",
+          "request": {
+            "description": {
+              "content": "Intentar acceder al dashboard sin token",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "dashboard"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                  "});"
+                ],
+                "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Intentar acceder al dashboard sin token",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "dashboard"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "4120095b-810d-45b1-82c4-39ec5143fe53",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:4000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "e55a8a2a-3d92-4386-88d0-92443d48a54b",
+          "status": "Forbidden",
+          "code": 403,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "29"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1d-N67srZe+pg7jAf/RV9vAw/TkJEU\""
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 28 Apr 2026 15:55:34 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              84,
+              111,
+              107,
+              101,
+              110,
+              32,
+              114,
+              101,
+              113,
+              117,
+              101,
+              114,
+              105,
+              100,
+              111,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 14,
+          "responseSize": 29
+        },
+        "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+        "assertions": [
+          {
+            "assertion": "Status code es 401",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status code es 401",
+              "message": "expected response to have status code 401 but got 403",
+              "stack": "AssertionError: expected response to have status code 401 but got 403\n   at Object.eval sandbox-script.js:1:5)"
+            }
+          },
+          {
+            "assertion": "Response contiene mensaje de error de autenticación",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "Response contiene mensaje de error de autenticación",
+              "message": "expected 'Token requerido' to include 'Unauthorized'",
+              "stack": "AssertionError: expected 'Token requerido' to include 'Unauthorized'\n   at Object.eval sandbox-script.js:2:5)"
+            }
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 2738
+    },
+    "failures": [
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code es 200",
+          "message": "expected response to have status code 200 but got 400",
+          "stack": "AssertionError: expected response to have status code 200 but got 400\n   at Object.eval sandbox-script.js:1:2)",
+          "checksum": "40e717da607fb99dd86faa213695ae2d",
+          "id": "bee3950f-b179-4f69-beef-fc81d15588e3",
+          "timestamp": 1777391734279,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 2,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+          "name": "Login - Valid Credentials",
+          "request": {
+            "description": {
+              "content": "Login con credenciales válidas",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene token', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('token');",
+                  "  pm.expect(responseJson.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Guardar token en variable', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.environment.set('auth_token', responseJson.token);",
+                  "});"
+                ],
+                "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "b3c07c82-2fa9-4519-ba2a-fff45d67f80e",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+              "name": "Login - Valid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales válidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene token', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('token');",
+                      "  pm.expect(responseJson.token).to.be.a('string');",
+                      "});",
+                      "",
+                      "pm.test('Guardar token en variable', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.environment.set('auth_token', responseJson.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+              "name": "Login - Invalid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales inválidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "07a2e4b2-a1be-4d7d-bc75-69601253ca5d",
+          "length": 5,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "be08dcb3-8f37-4afa-9513-8fb2565134e3",
+          "scriptId": "008ea57f-6d05-433c-9afa-553595cd9881",
+          "execution": "7a3a2e7b-16f9-4aca-925b-865984038675"
+        }
+      },
+      {
+        "error": {
+          "name": "JSONError",
+          "index": 1,
+          "test": "Response contiene token",
+          "message": "Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^",
+          "stack": "JSONError: Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^\n   at Object.eval sandbox-script.js:2:2)",
+          "checksum": "fdb70be37103635e91ee7eae7d31a10e",
+          "id": "9dd4d86f-31e1-431e-b36c-58df65962d13",
+          "timestamp": 1777391734286,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 2,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+          "name": "Login - Valid Credentials",
+          "request": {
+            "description": {
+              "content": "Login con credenciales válidas",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene token', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('token');",
+                  "  pm.expect(responseJson.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Guardar token en variable', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.environment.set('auth_token', responseJson.token);",
+                  "});"
+                ],
+                "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "b3c07c82-2fa9-4519-ba2a-fff45d67f80e",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+              "name": "Login - Valid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales válidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene token', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('token');",
+                      "  pm.expect(responseJson.token).to.be.a('string');",
+                      "});",
+                      "",
+                      "pm.test('Guardar token en variable', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.environment.set('auth_token', responseJson.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+              "name": "Login - Invalid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales inválidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "07a2e4b2-a1be-4d7d-bc75-69601253ca5d",
+          "length": 5,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "be08dcb3-8f37-4afa-9513-8fb2565134e3",
+          "scriptId": "008ea57f-6d05-433c-9afa-553595cd9881",
+          "execution": "7a3a2e7b-16f9-4aca-925b-865984038675"
+        }
+      },
+      {
+        "error": {
+          "name": "JSONError",
+          "index": 2,
+          "test": "Guardar token en variable",
+          "message": "Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^",
+          "stack": "JSONError: Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^\n   at Object.eval sandbox-script.js:3:2)",
+          "checksum": "a2f66e21af15d1405c0ef799f5d858ed",
+          "id": "c14609f6-9e64-4ba5-b75b-cd9d5c4186ea",
+          "timestamp": 1777391734288,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 3,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 2,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:2 in test-script",
+        "source": {
+          "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+          "name": "Login - Valid Credentials",
+          "request": {
+            "description": {
+              "content": "Login con credenciales válidas",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene token', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('token');",
+                  "  pm.expect(responseJson.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Guardar token en variable', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.environment.set('auth_token', responseJson.token);",
+                  "});"
+                ],
+                "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "b3c07c82-2fa9-4519-ba2a-fff45d67f80e",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+              "name": "Login - Valid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales válidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene token', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('token');",
+                      "  pm.expect(responseJson.token).to.be.a('string');",
+                      "});",
+                      "",
+                      "pm.test('Guardar token en variable', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.environment.set('auth_token', responseJson.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+              "name": "Login - Invalid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales inválidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "07a2e4b2-a1be-4d7d-bc75-69601253ca5d",
+          "length": 5,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "be08dcb3-8f37-4afa-9513-8fb2565134e3",
+          "scriptId": "008ea57f-6d05-433c-9afa-553595cd9881",
+          "execution": "7a3a2e7b-16f9-4aca-925b-865984038675"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code es 401",
+          "message": "expected response to have status code 401 but got 400",
+          "stack": "AssertionError: expected response to have status code 401 but got 400\n   at Object.eval sandbox-script.js:1:3)",
+          "checksum": "17e70d2e7e9bcde60807e3d33ff6c3f2",
+          "id": "e2dd27f4-461a-4e02-93d4-76dfdfa0925e",
+          "timestamp": 1777391734391,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 3,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+          "name": "Login - Invalid Credentials",
+          "request": {
+            "description": {
+              "content": "Login con credenciales inválidas",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de error', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                  "});"
+                ],
+                "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "b3c07c82-2fa9-4519-ba2a-fff45d67f80e",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+              "name": "Login - Valid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales válidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene token', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('token');",
+                      "  pm.expect(responseJson.token).to.be.a('string');",
+                      "});",
+                      "",
+                      "pm.test('Guardar token en variable', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.environment.set('auth_token', responseJson.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+              "name": "Login - Invalid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales inválidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "f3e2677d-7a6a-4efc-a49f-31330b295cc4",
+          "length": 5,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "ee5921b4-01db-4599-85ea-06b6df70b7ed",
+          "scriptId": "35eab917-6be1-456c-83fa-c60d6aae7363",
+          "execution": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+        }
+      },
+      {
+        "error": {
+          "name": "JSONError",
+          "index": 1,
+          "test": "Response contiene mensaje de error",
+          "message": "Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^",
+          "stack": "JSONError: Unexpected token '<' at 1:1\n<!DOCTYPE html>\n^\n   at Object.eval sandbox-script.js:2:3)",
+          "checksum": "c7adf4b872fc1c5cc22ceb28f0c1d858",
+          "id": "1d233675-ff52-4054-b1c5-0e6730e6ada1",
+          "timestamp": 1777391734397,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 3,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+          "name": "Login - Invalid Credentials",
+          "request": {
+            "description": {
+              "content": "Login con credenciales inválidas",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de error', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                  "});"
+                ],
+                "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "b3c07c82-2fa9-4519-ba2a-fff45d67f80e",
+          "name": "Authentication",
+          "item": [
+            {
+              "id": "1bdaf789-fdf6-4098-a95e-105ff7cfb7ba",
+              "name": "Login - Valid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales válidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"edwar\\\",\\n  \\\"password\\\": \\\"password\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "008ea57f-6d05-433c-9afa-553595cd9881",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene token', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('token');",
+                      "  pm.expect(responseJson.token).to.be.a('string');",
+                      "});",
+                      "",
+                      "pm.test('Guardar token en variable', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.environment.set('auth_token', responseJson.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "7a3a2e7b-16f9-4aca-925b-865984038675"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "c495941d-368c-4bf9-b222-17eaad1f04c5",
+              "name": "Login - Invalid Credentials",
+              "request": {
+                "description": {
+                  "content": "Login con credenciales inválidas",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\\n  \\\"username\\\": \\\"invalid\\\",\\n  \\\"password\\\": \\\"wrong\\\"\\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "35eab917-6be1-456c-83fa-c60d6aae7363",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Invalid credentials');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "f3e2677d-7a6a-4efc-a49f-31330b295cc4",
+          "length": 5,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "ee5921b4-01db-4599-85ea-06b6df70b7ed",
+          "scriptId": "35eab917-6be1-456c-83fa-c60d6aae7363",
+          "execution": "99c2a8ac-0c9f-4138-a432-5e108dc78265"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code es 200",
+          "message": "expected response to have status code 200 but got 401",
+          "stack": "AssertionError: expected response to have status code 200 but got 401\n   at Object.eval sandbox-script.js:1:4)",
+          "checksum": "6998e7692a91044ac42ffeacd76a4179",
+          "id": "ba052ee2-c174-4fcf-8044-4f5cff2b20a9",
+          "timestamp": 1777391734509,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 4,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+          "name": "GET /dashboard - Con Token",
+          "request": {
+            "description": {
+              "content": "Acceder al dashboard con token válido",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "dashboard"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                "type": "text/javascript",
+                "exec": [
+                  "// Obtener token guardado o hacer login",
+                  "const token = pm.environment.get('auth_token');",
+                  "if (!token) {",
+                  "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                  "}"
+                ],
+                "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de bienvenida', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('dashboard');",
+                  "});",
+                  "",
+                  "pm.test('Response contiene datos del usuario', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('users');",
+                  "});"
+                ],
+                "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "096c4a06-cdc5-4889-8da0-a0eeace2cd62",
+          "name": "Protected Endpoints",
+          "item": [
+            {
+              "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+              "name": "GET /dashboard - Con Token",
+              "request": {
+                "description": {
+                  "content": "Acceder al dashboard con token válido",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Obtener token guardado o hacer login",
+                      "const token = pm.environment.get('auth_token');",
+                      "if (!token) {",
+                      "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                      "}"
+                    ],
+                    "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de bienvenida', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('dashboard');",
+                      "});",
+                      "",
+                      "pm.test('Response contiene datos del usuario', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('users');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+              "name": "GET /dashboard - Sin Token",
+              "request": {
+                "description": {
+                  "content": "Intentar acceder al dashboard sin token",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "83010dc6-8e71-4ce3-9143-3937cf702530",
+          "length": 5,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "053d0599-2435-481e-b8b0-cd2e91590636",
+          "scriptId": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+          "execution": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "Response contiene mensaje de bienvenida",
+          "message": "expected 'Token inválido' to include 'dashboard'",
+          "stack": "AssertionError: expected 'Token inválido' to include 'dashboard'\n   at Object.eval sandbox-script.js:2:4)",
+          "checksum": "45029ff72f8d29edf3e359681ff54906",
+          "id": "25908b42-0d46-4585-84be-e11bbd99dfed",
+          "timestamp": 1777391734512,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 4,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+          "name": "GET /dashboard - Con Token",
+          "request": {
+            "description": {
+              "content": "Acceder al dashboard con token válido",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "dashboard"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                "type": "text/javascript",
+                "exec": [
+                  "// Obtener token guardado o hacer login",
+                  "const token = pm.environment.get('auth_token');",
+                  "if (!token) {",
+                  "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                  "}"
+                ],
+                "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de bienvenida', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('dashboard');",
+                  "});",
+                  "",
+                  "pm.test('Response contiene datos del usuario', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('users');",
+                  "});"
+                ],
+                "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "096c4a06-cdc5-4889-8da0-a0eeace2cd62",
+          "name": "Protected Endpoints",
+          "item": [
+            {
+              "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+              "name": "GET /dashboard - Con Token",
+              "request": {
+                "description": {
+                  "content": "Acceder al dashboard con token válido",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Obtener token guardado o hacer login",
+                      "const token = pm.environment.get('auth_token');",
+                      "if (!token) {",
+                      "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                      "}"
+                    ],
+                    "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de bienvenida', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('dashboard');",
+                      "});",
+                      "",
+                      "pm.test('Response contiene datos del usuario', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('users');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+              "name": "GET /dashboard - Sin Token",
+              "request": {
+                "description": {
+                  "content": "Intentar acceder al dashboard sin token",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "83010dc6-8e71-4ce3-9143-3937cf702530",
+          "length": 5,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "053d0599-2435-481e-b8b0-cd2e91590636",
+          "scriptId": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+          "execution": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 2,
+          "test": "Response contiene datos del usuario",
+          "message": "expected { message: 'Token inválido' } to have property 'users'",
+          "stack": "AssertionError: expected { message: 'Token inválido' } to have property 'users'\n   at Object.eval sandbox-script.js:3:4)",
+          "checksum": "8b33fca71694d823df10b4455b27e8b4",
+          "id": "aec938b6-671b-4dc4-a264-d6d7bc556da5",
+          "timestamp": 1777391734514,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 3,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 4,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:2 in test-script",
+        "source": {
+          "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+          "name": "GET /dashboard - Con Token",
+          "request": {
+            "description": {
+              "content": "Acceder al dashboard con token válido",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "dashboard"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                "type": "text/javascript",
+                "exec": [
+                  "// Obtener token guardado o hacer login",
+                  "const token = pm.environment.get('auth_token');",
+                  "if (!token) {",
+                  "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                  "}"
+                ],
+                "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de bienvenida', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('dashboard');",
+                  "});",
+                  "",
+                  "pm.test('Response contiene datos del usuario', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('users');",
+                  "});"
+                ],
+                "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "096c4a06-cdc5-4889-8da0-a0eeace2cd62",
+          "name": "Protected Endpoints",
+          "item": [
+            {
+              "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+              "name": "GET /dashboard - Con Token",
+              "request": {
+                "description": {
+                  "content": "Acceder al dashboard con token válido",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Obtener token guardado o hacer login",
+                      "const token = pm.environment.get('auth_token');",
+                      "if (!token) {",
+                      "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                      "}"
+                    ],
+                    "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de bienvenida', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('dashboard');",
+                      "});",
+                      "",
+                      "pm.test('Response contiene datos del usuario', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('users');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+              "name": "GET /dashboard - Sin Token",
+              "request": {
+                "description": {
+                  "content": "Intentar acceder al dashboard sin token",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "83010dc6-8e71-4ce3-9143-3937cf702530",
+          "length": 5,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "053d0599-2435-481e-b8b0-cd2e91590636",
+          "scriptId": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+          "execution": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status code es 401",
+          "message": "expected response to have status code 401 but got 403",
+          "stack": "AssertionError: expected response to have status code 401 but got 403\n   at Object.eval sandbox-script.js:1:5)",
+          "checksum": "32d35fc124078ab957e511432fd24f36",
+          "id": "74df7d83-4db5-48d7-8e82-d59f1bef9d30",
+          "timestamp": 1777391734619,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 5,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+          "name": "GET /dashboard - Sin Token",
+          "request": {
+            "description": {
+              "content": "Intentar acceder al dashboard sin token",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "dashboard"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                  "});"
+                ],
+                "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "096c4a06-cdc5-4889-8da0-a0eeace2cd62",
+          "name": "Protected Endpoints",
+          "item": [
+            {
+              "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+              "name": "GET /dashboard - Con Token",
+              "request": {
+                "description": {
+                  "content": "Acceder al dashboard con token válido",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Obtener token guardado o hacer login",
+                      "const token = pm.environment.get('auth_token');",
+                      "if (!token) {",
+                      "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                      "}"
+                    ],
+                    "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de bienvenida', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('dashboard');",
+                      "});",
+                      "",
+                      "pm.test('Response contiene datos del usuario', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('users');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+              "name": "GET /dashboard - Sin Token",
+              "request": {
+                "description": {
+                  "content": "Intentar acceder al dashboard sin token",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "bc0e7f6f-592d-42e1-b69a-aa472062f847",
+          "length": 5,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "8db19d3d-b491-4a24-b9a3-eccd2626b7b0",
+          "scriptId": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+          "execution": "341f4669-d878-4c8a-9a0d-840808b524b6"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "Response contiene mensaje de error de autenticación",
+          "message": "expected 'Token requerido' to include 'Unauthorized'",
+          "stack": "AssertionError: expected 'Token requerido' to include 'Unauthorized'\n   at Object.eval sandbox-script.js:2:5)",
+          "checksum": "14a0804268bcd7777677d4b1b5e79673",
+          "id": "2a858786-d434-4081-8552-b5f061cf01b0",
+          "timestamp": 1777391734628,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 5,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+          "name": "GET /dashboard - Sin Token",
+          "request": {
+            "description": {
+              "content": "Intentar acceder al dashboard sin token",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "dashboard"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                  "  const responseJson = pm.response.json();",
+                  "  pm.expect(responseJson).to.have.property('message');",
+                  "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                  "});"
+                ],
+                "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "096c4a06-cdc5-4889-8da0-a0eeace2cd62",
+          "name": "Protected Endpoints",
+          "item": [
+            {
+              "id": "6be5b28c-07ca-4042-b477-f2d436003a0f",
+              "name": "GET /dashboard - Con Token",
+              "request": {
+                "description": {
+                  "content": "Acceder al dashboard con token válido",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "661584b1-e306-44f0-9ab5-4b1a6814113e",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Obtener token guardado o hacer login",
+                      "const token = pm.environment.get('auth_token');",
+                      "if (!token) {",
+                      "  console.log('⚠️ Token no encontrado. Ejecuta primero: Login - Valid Credentials');",
+                      "}"
+                    ],
+                    "_lastExecutionId": "7bb9fc0e-7122-4f96-a15e-5054c99e8906"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "172d4b5e-94e1-4293-8c84-c114514dcb92",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 200', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de bienvenida', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('dashboard');",
+                      "});",
+                      "",
+                      "pm.test('Response contiene datos del usuario', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('users');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "2ef48f61-894b-46bf-83f6-5c7438c1357f"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "bde82d8b-c217-47d0-96b3-1d158e626121",
+              "name": "GET /dashboard - Sin Token",
+              "request": {
+                "description": {
+                  "content": "Intentar acceder al dashboard sin token",
+                  "type": "text/plain"
+                },
+                "url": {
+                  "path": [
+                    "dashboard"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code es 401', function () {",
+                      "  pm.response.to.have.status(401);",
+                      "});",
+                      "",
+                      "pm.test('Response contiene mensaje de error de autenticación', function () {",
+                      "  const responseJson = pm.response.json();",
+                      "  pm.expect(responseJson).to.have.property('message');",
+                      "  pm.expect(responseJson.message).to.include('Unauthorized');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "341f4669-d878-4c8a-9a0d-840808b524b6"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "bc0e7f6f-592d-42e1-b69a-aa472062f847",
+          "length": 5,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "8db19d3d-b491-4a24-b9a3-eccd2626b7b0",
+          "scriptId": "67369793-a7cf-418b-a5c4-f8cb8aeb60d6",
+          "execution": "341f4669-d878-4c8a-9a0d-840808b524b6"
+        }
+      }
+    ],
+    "error": null
+  }
+}

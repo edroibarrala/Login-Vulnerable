@@ -1,10 +1,10 @@
  const express = require('express');
 const jwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const SECRET_KEY = "mi_clave_secreta_super_segura";
