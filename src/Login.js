@@ -68,9 +68,9 @@ function Login() {
           fontSize: '28px',
           fontWeight: '600'
         }}>Login</h2>
-        
-        <input 
-          placeholder="Usuario" 
+
+        <input
+          placeholder="Usuario"
           onChange={e => setUsername(e.target.value)}
           style={{
             width: '100%',
@@ -86,10 +86,10 @@ function Login() {
           onFocus={(e) => e.target.style.borderColor = '#667eea'}
           onBlur={(e) => e.target.style.borderColor = '#ddd'}
         />
-        
-        <input 
-          type="password" 
-          placeholder="Contraseña" 
+
+        <input
+          type="password"
+          placeholder="Contraseña"
           onChange={e => setPassword(e.target.value)}
           style={{
             width: '100%',
@@ -105,8 +105,8 @@ function Login() {
           onFocus={(e) => e.target.style.borderColor = '#667eea'}
           onBlur={(e) => e.target.style.borderColor = '#ddd'}
         />
-        
-        <button 
+
+        <button
           onClick={handleLogin}
           style={{
             width: '100%',
